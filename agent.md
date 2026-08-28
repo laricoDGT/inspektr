@@ -1,190 +1,59 @@
-# Inspektr — Chrome Extension Agent Reference
+# Inspektr — Agent Reference
 
-> Multi-functional web developer toolkit, built as a Chrome (Chromium-compatible) extension.
-
-> **Note for agents**: This project uses **Graphify** as the AI agent/tool to assist in developing, editing, and scaffolding this extension.
+Chrome / Chromium Extension (Manifest V3) for web developers and designers.
 
 ---
 
-## Project Identity
-
-| Field        | Value                                        |
-|--------------|----------------------------------------------|
-| Name         | **Inspektr**                                 |
-| Agent Tool   | Graphify (used to build & edit this project) |
-| Type         | Chrome / Chromium Browser Extension (MV3)    |
-| Target       | Web Developers & Designers                   |
-| Manifest Ver | Manifest V3 (MV3)                            |
-| Entry Point  | `manifest.json`                              |
-
----
-
-## Architecture Overview
+## 1. Project Structure
 
 ```
 inspektr/
-├── manifest.json           # MV3 manifest — permissions, action, content scripts
+├── manifest.json              # MV3 manifest (activeTab, scripting, storage)
 ├── background/
-│   └── service-worker.js   # Background service worker (MV3)
+│   └── service-worker.js      # Background worker: tab state & script injection
 ├── content/
-│   └── content.js          # Content script injected into pages
+│   └── content.js             # Content script router on inspected tab
 ├── popup/
-│   ├── popup.html          # Extension popup (tool launcher)
-│   ├── popup.css           # Popup styles
-│   └── popup.js            # Popup logic
-├── panel/                  # DevTools panel (future)
-│   └── ...
+│   ├── popup.html             # Extension popup launcher
+│   ├── popup.css              # Popup styling (dark mode, glassmorphic)
+│   └── popup.js               # Tool toggle logic & automatic popup closing
 ├── tools/
-│   ├── font-detector/      # Tool 1 — Font Detector
-│   │   ├── font-detector.js
-│   │   └── font-detector.css
-│   ├── color-picker/       # Tool 2 — Color Picker (planned)
-│   ├── image-inspector/    # Tool 3 — Image Inspector (planned)
-│   └── ...
+│   └── font-detector/
+│       └── font-detector.js   # Isolated Shadow DOM typography inspector
+├── shared/
+│   ├── constants.js           # Shared action types, tools, and font lists
+│   └── utils.js               # Helper utilities
 ├── assets/
-│   ├── icons/              # Extension icons (16, 48, 128 px)
-│   └── fonts/
-└── shared/
-    ├── utils.js            # Shared utilities
-    └── constants.js        # Shared constants
+│   └── icons/                 # Extension PNG icons (icon16, 32, 48, 128)
+└── build.sh                   # Build & zip validation script
 ```
 
 ---
 
-## Tool Registry
+## 2. Core Architecture & Tool Lifecycle
 
-| # | Tool Name         | Status     | Description                                              |
-|---|-------------------|------------|----------------------------------------------------------|
-| 1 | Font Detector     | ✅ Active  | Detect & inspect all fonts used on a web page            |
-| 2 | Color Picker      | 🔜 Planned | Pick & analyze colors from any element on the page       |
-| 3 | Image Inspector   | 🔜 Planned | List all images: format, size, resolution, alt text      |
-| 4 | Spacing Inspector | 🔜 Planned | Visualize margin/padding/gap on any element              |
-| 5 | CSS Variables     | 🔜 Planned | Extract all CSS custom properties (variables) from a page|
-| 6 | Breakpoint Ruler  | 🔜 Planned | Visual viewport ruler and breakpoint helper              |
-| 7 | Accessibility     | 🔜 Planned | Quick a11y audit: contrast ratio, ARIA roles, headings   |
-| 8 | Grid Overlay      | 🔜 Planned | Toggle grid/flexbox overlay on any element               |
+1. **Activation**:
+   - User opens extension popup and clicks a tool (e.g. **Font Detector**).
+   - `popup.js` sends `{ action: 'TOGGLE_TOOL', tool: 'font-detector', tabId }` to `background/service-worker.js`.
+   - `service-worker.js` ensures scripts are injected into the active tab via `chrome.scripting.executeScript` (`tools/font-detector/font-detector.js` + `content/content.js`), then sends `ACTIVATE_FONT_DETECTOR`.
+   - Once activated, `popup.js` automatically calls `window.close()` to immediately reveal the inspected page.
 
----
+2. **In-Page Inspection**:
+   - `font-detector.js` mounts an isolated **Shadow DOM** (`#__inspektr-font-detector`) at `z-index: 2147483647`.
+   - Renders a floating status bar at the top-right with an **Exit** button.
+   - Crosshair cursor, live hover tooltip, and click-to-pin functionality.
 
-## Tech Stack
-
-| Layer        | Technology                         |
-|--------------|------------------------------------|
-| Manifest     | Chrome Extension Manifest V3       |
-| Scripting    | Vanilla JavaScript (ES Modules)    |
-| Styling      | Vanilla CSS (custom properties)    |
-| Icons        | SVG + PNG (16/48/128)              |
-| Build        | None (no bundler initially)        |
-| Permissions  | `activeTab`, `scripting`, `storage`|
+3. **Deactivation**:
+   - Clicking the red **Exit** button (or pressing <kbd>Esc</kbd>) calls `deactivate()`:
+     - Cleans up DOM, overlays, and event listeners.
+     - Sends `{ action: 'DEACTIVATE_FONT_DETECTOR' }` to `service-worker.js` to reset tab state to `false`.
 
 ---
 
-## Design System
+## 3. Development Guidelines
 
-### Colors
-```css
---inspektr-bg:         #0F1117;   /* Main dark background     */
---inspektr-surface:    #1A1D27;   /* Card / panel surface     */
---inspektr-border:     #2A2D3E;   /* Subtle borders           */
---inspektr-accent:     #7C6FE0;   /* Primary purple accent    */
---inspektr-accent-2:   #4ECDC4;   /* Teal secondary accent    */
---inspektr-text:       #E8EAF0;   /* Primary text             */
---inspektr-muted:      #6B7280;   /* Secondary / muted text   */
---inspektr-success:    #10B981;   /* Success green            */
---inspektr-warning:    #F59E0B;   /* Warning amber            */
-```
-
-### Typography
-- **UI Font**: `Inter`, fallback `system-ui`
-- **Mono Font**: `JetBrains Mono`, fallback `monospace`
-
-### Sizing
-- Popup width: `380px`
-- Popup max-height: `580px`
-- Border radius: `8px` (cards), `4px` (badges)
-
----
-
-## Tool: Font Detector
-
-### Goal
-Replicate and extend the core functionality of **WhatFont** — detect every font family, weight, style, size and line-height used on any DOM element the user hovers or clicks.
-
-### Features
-- **Hover mode**: Tooltip appears on hover showing font info
-- **Click to pin**: Click to pin a font card with full details
-- **Page scan**: Scan all elements and list unique fonts used
-- **Copy**: One-click copy of font name / CSS value
-- **Google Fonts link**: If font is a Google Font, show a direct link
-
-### Data Collected per Element
-```js
-{
-  fontFamily:   string,    // e.g. "Inter"
-  fontWeight:   string,    // e.g. "700"
-  fontStyle:    string,    // e.g. "italic"
-  fontSize:     string,    // e.g. "16px"
-  lineHeight:   string,    // e.g. "24px"
-  letterSpacing:string,    // e.g. "0.02em"
-  color:        string,    // e.g. "#1A1D27"
-  source:       string,    // "web-font" | "system-font" | "google-font"
-  element:      string,    // e.g. "h1", "p", ".hero-title"
-}
-```
-
-### Implementation Strategy
-1. Content script listens for `mousemove` to track hovered element
-2. `getComputedStyle(element)` extracts font properties
-3. `document.fonts` API queries loaded font faces
-4. Tooltip is injected into the DOM as a shadow DOM element (avoids CSS collision)
-5. Pinned cards are stored in a floating panel (also shadow DOM)
-6. Full page scan iterates all visible text nodes
-
----
-
-## Coding Guidelines
-
-- All tools **must use Shadow DOM** to avoid CSS/JS conflicts with host pages
-- Content scripts communicate with popup via `chrome.runtime.sendMessage`
-- No external libraries in content scripts (pure JS only)
-- Use `chrome.storage.local` for persisting user preferences
-- All strings must be in English (UI copy)
-- Prefer `const` / `let` over `var`
-- Use `async/await` over raw Promises where possible
-
----
-
-## Manifest Permissions
-
-```json
-{
-  "permissions": ["activeTab", "scripting", "storage"],
-  "host_permissions": ["<all_urls>"]
-}
-```
-
----
-
-## Build & Load Instructions
-
-1. Clone / open project folder in your editor
-2. Open Chrome → `chrome://extensions`
-3. Enable **Developer Mode** (top right toggle)
-4. Click **"Load unpacked"** → select the project root folder
-5. Graphify icon appears in the toolbar
-
----
-
-## Versioning Strategy
-
-| Version | Milestone                              |
-|---------|----------------------------------------|
-| 0.1.0   | Font Detector (hover + page scan)      |
-| 0.2.0   | Color Picker tool                      |
-| 0.3.0   | Image Inspector tool                   |
-| 0.4.0   | CSS Variables extractor                |
-| 1.0.0   | Chrome Web Store submission ready      |
-
----
-
-*Last updated: 2026-08-28 — Inspektr v0.1.0 roadmap*
+- **Shadow DOM**: All in-page UI elements MUST live inside a closed Shadow DOM to avoid CSS conflicts with target websites.
+- **Least Privilege**: Only use `activeTab`, `scripting`, and `storage`. Never add broad `<all_urls>` host permissions.
+- **Pure JavaScript**: No external dependencies or bundlers required.
+- **Icons**: Always use official PNG assets from `assets/icons/` (`icon32.png`, `icon48.png`, etc.).
+- **Build / Packaging**: Run `bash build.sh` to validate `manifest.json` and generate `inspektr-v<version>.zip`.

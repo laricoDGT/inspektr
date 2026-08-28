@@ -16,6 +16,7 @@ const tabUrlEl           = document.getElementById('tab-url');
 const tabDotEl           = document.getElementById('tab-dot');
 const fontDetectorCard   = document.getElementById('tool-font-detector');
 const fontDetectorToggle = document.getElementById('font-detector-toggle');
+const fontDetectorBadge  = document.getElementById('font-detector-badge');
 const scanPanel          = document.getElementById('scan-panel');
 const fontsList          = document.getElementById('fonts-list');
 const scanCloseBtn       = document.getElementById('scan-close');
@@ -133,7 +134,7 @@ async function handleFontDetectorToggle() {
         if (isFontDetectorActive) {
           setTimeout(() => {
             window.close();
-          }, 120);
+          }, 80);
         }
       }
     }
@@ -145,6 +146,12 @@ function updateFontDetectorUI() {
   fontDetectorCard.classList.toggle('enabled', isFontDetectorActive);
   fontDetectorToggle.setAttribute('aria-checked', String(isFontDetectorActive));
   scanPageBtn.disabled = !isFontDetectorActive;
+
+  if (fontDetectorBadge) {
+    fontDetectorBadge.textContent = isFontDetectorActive ? 'Active' : 'Ready';
+    fontDetectorBadge.className = isFontDetectorActive ? 'tool-badge active-badge' : 'tool-badge ready-badge';
+  }
+
   footerHint.textContent = isFontDetectorActive
     ? 'Hover or click elements on the page'
     : 'Activate Font Detector first';

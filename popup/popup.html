@@ -12,15 +12,7 @@
   <header class="header">
     <div class="header-logo">
       <div class="logo-icon" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2 7L7 17L12 9L17 17L22 7" stroke="url(#wave-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <defs>
-            <linearGradient id="wave-grad" x1="2" y1="12" x2="22" y2="12" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#7C6FE0"/>
-              <stop offset="100%" stop-color="#4ECDC4"/>
-            </linearGradient>
-          </defs>
-        </svg>
+        <img src="../assets/icons/icon32.png" alt="Inspektr" width="22" height="22" />
       </div>
       <div class="logo-text">
         <span class="logo-name">Ins<span class="logo-accent">pektr</span></span>
@@ -36,8 +28,8 @@
   <!-- ═══════════════════════════════════════ TOOLS ════ -->
   <main class="tools-grid">
 
-    <!-- Font Detector — ACTIVE -->
-    <div class="tool-card active" id="tool-font-detector" role="button" tabindex="0" aria-label="Toggle Font Detector">
+    <!-- Font Detector -->
+    <div class="tool-card" id="tool-font-detector" role="button" tabindex="0" aria-label="Toggle Font Detector">
       <div class="tool-card-header">
         <div class="tool-icon-wrap">
           <svg class="tool-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -54,7 +46,7 @@
         <p class="tool-name">Font Detector</p>
         <p class="tool-desc">Hover to inspect fonts on any element</p>
       </div>
-      <div class="tool-badge active-badge">Active</div>
+      <div class="tool-badge ready-badge" id="font-detector-badge">Ready</div>
     </div>
 
     <!-- Color Picker — COMING SOON -->

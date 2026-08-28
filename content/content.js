@@ -16,17 +16,26 @@
 
   /**
    * Lazy-loads the Font Detector tool.
-   * @returns {Promise<FontDetector>}
+   * @returns {Promise<any>}
    */
   async function loadFontDetector() {
     if (fontDetectorInstance) return fontDetectorInstance;
 
-    // Dynamically load the font detector module
+    if (typeof window.InspektrFontDetector === 'function') {
+      fontDetectorInstance = new window.InspektrFontDetector();
+      return fontDetectorInstance;
+    }
+
+    // Dynamically load the font detector module as fallback
     const src = chrome.runtime.getURL('tools/font-detector/font-detector.js');
     await import(src);
 
-    fontDetectorInstance = new window.InspektrFontDetector();
-    return fontDetectorInstance;
+    if (typeof window.InspektrFontDetector === 'function') {
+      fontDetectorInstance = new window.InspektrFontDetector();
+      return fontDetectorInstance;
+    }
+
+    throw new Error('InspektrFontDetector class not found');
   }
 
   /**

@@ -43,7 +43,7 @@ async function ensureContentScript(tabId) {
   try {
     await chrome.scripting.executeScript({
       target: { tabId, allFrames: false },
-      files: ['content/content.js'],
+      files: ['tools/font-detector/font-detector.js', 'content/content.js'],
     });
     return true;
   } catch (err) {
@@ -78,20 +78,35 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   // ── Toggle a tool on/off ──
   if (action === 'TOGGLE_TOOL') {
-    const state = getTabState(msgTabId);
+    (async () => {
+      const state = getTabState(msgTabId);
 
-    if (tool === 'font-detector') {
-      state.fontDetector = !state.fontDetector;
-      const activate = state.fontDetector;
+      if (tool === 'font-detector') {
+        state.fontDetector = !state.fontDetector;
+        const activate = state.fontDetector;
 
-      sendToContent(msgTabId, {
-        action: activate ? 'ACTIVATE_FONT_DETECTOR' : 'DEACTIVATE_FONT_DETECTOR',
-      });
+        await sendToContent(msgTabId, {
+          action: activate ? 'ACTIVATE_FONT_DETECTOR' : 'DEACTIVATE_FONT_DETECTOR',
+        });
 
-      sendResponse({ success: true, active: activate });
-    }
+        sendResponse({ success: true, active: activate });
+      } else {
+        sendResponse({ success: false, error: 'Unknown tool' });
+      }
+    })();
 
     return true; // keep channel open for async
+  }
+
+  // ── Deactivate tool (e.g. from in-page Exit button or Esc key) ──
+  if (action === 'DEACTIVATE_FONT_DETECTOR') {
+    const targetTabId = _sender?.tab?.id || msgTabId;
+    if (targetTabId) {
+      const state = getTabState(targetTabId);
+      state.fontDetector = false;
+    }
+    sendResponse({ success: true, active: false });
+    return true;
   }
 
   // ── Query tool state from popup ──

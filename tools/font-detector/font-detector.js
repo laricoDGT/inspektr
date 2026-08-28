@@ -7,6 +7,8 @@
 (function () {
   'use strict';
 
+  if (window.InspektrFontDetector) return;
+
   // ── Known Fonts Database ──────────────────────────
   const GOOGLE_FONTS = new Set([
     'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Oswald', 'Raleway',
@@ -20,7 +22,7 @@
     'Albert Sans', 'Figtree', 'Work Sans', 'Rubik', 'Mulish', 'Quicksand',
     'Barlow', 'Exo 2', 'Kanit', 'Prompt', 'Noto Serif', 'Libre Franklin',
     'EB Garamond', 'Cormorant Garamond', 'Lora', 'PT Serif', 'Bitter',
-    'Spectral', 'Arvo', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Source Code Pro',
+    'Spectral', 'Arvo', 'JetBrains Mono', 'Fira Code', 'Source Code Pro',
     'Space Mono', 'Roboto Mono', 'IBM Plex Mono', 'DM Mono',
   ]);
 
@@ -459,10 +461,7 @@
       bar.className = 'wd-control-bar';
       bar.innerHTML = `
         <div class="wd-control-brand">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-            <circle cx="10" cy="10" r="6" stroke="#9B8FF5" stroke-width="2.4"/>
-            <line x1="14.5" y1="14.5" x2="20" y2="20" stroke="#5FDDD8" stroke-width="2.4" stroke-linecap="round"/>
-          </svg>
+          <img src="${chrome.runtime.getURL('assets/icons/icon32.png')}" width="16" height="16" alt="Inspektr" style="display:block;border-radius:3px;" />
           Inspektr
         </div>
         <div class="wd-control-pill">
