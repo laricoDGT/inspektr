@@ -1,0 +1,10 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'>
+  <!-- Background -->
+  <rect width='128' height='128' rx='25.6' fill='#0F1117'/>
+  <!-- Magnifying glass ring — purple -->
+  <circle cx='51.2' cy='48.6' r='29.4'
+    fill='none' stroke='#9B8FF5' stroke-width='10.9'/>
+  <!-- Handle — teal -->
+  <line x1='71.8' y1='69.2' x2='106.2' y2='106.2'
+    stroke='#5FDDD8' stroke-width='11.4' stroke-linecap='round'/>
+</svg>
