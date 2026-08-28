@@ -1,14 +1,15 @@
 /**
  * Inspektr — Popup Script
  * Handles UI state, tool toggles, and communication with background service worker.
+ * Automatically closes popup when a tool is activated for seamless workflow.
  */
 
 import { ACTIONS, TOOLS } from '../shared/constants.js';
 
 // ── State ──────────────────────────────────────────────
-let currentTab   = null;
+let currentTab           = null;
 let isFontDetectorActive = false;
-let isScanning   = false;
+let isScanning           = false;
 
 // ── DOM References ─────────────────────────────────────
 const tabUrlEl           = document.getElementById('tab-url');
@@ -35,7 +36,6 @@ async function init() {
 
 /**
  * Get the currently active browser tab.
- * Note: URL is available because the user clicked the extension icon (activeTab grant).
  */
 async function getActiveTab() {
   return new Promise((resolve) => {
@@ -47,13 +47,11 @@ async function getActiveTab() {
 
 /**
  * Display tab hostname in the header bar.
- * Falls back gracefully if URL is not accessible.
  */
 function displayTabInfo(tab) {
   try {
     if (tab.url) {
       const url = new URL(tab.url);
-      // Block list for restricted pages
       if (tab.url.startsWith('chrome://') || tab.url.startsWith('edge://') ||
           tab.url.startsWith('about:') || tab.url.startsWith('chrome-extension://')) {
         tabUrlEl.textContent = 'Restricted page';
@@ -130,6 +128,13 @@ async function handleFontDetectorToggle() {
       if (response?.success) {
         isFontDetectorActive = response.active;
         updateFontDetectorUI();
+
+        // When activating the tool, automatically close popup so the user can inspect immediately
+        if (isFontDetectorActive) {
+          setTimeout(() => {
+            window.close();
+          }, 120);
+        }
       }
     }
   );
@@ -141,7 +146,7 @@ function updateFontDetectorUI() {
   fontDetectorToggle.setAttribute('aria-checked', String(isFontDetectorActive));
   scanPageBtn.disabled = !isFontDetectorActive;
   footerHint.textContent = isFontDetectorActive
-    ? 'Hover over any element to inspect'
+    ? 'Hover or click elements on the page'
     : 'Activate Font Detector first';
 }
 
