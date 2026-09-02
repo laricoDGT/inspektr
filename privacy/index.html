@@ -168,7 +168,7 @@
     </div>
 
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: August 28, 2026</p>
+    <p class="updated">Last updated: September 2, 2026</p>
 
     <div class="highlight">
       <strong>Core Privacy Commitment:</strong> Inspektr is an all-in-one web developer toolkit. We collect, store, and transmit <strong>zero personal data</strong>. All analysis, styling extraction, element diagnostics, and inspection operations happen strictly in your local browser runtime.
@@ -198,14 +198,14 @@
       <li><strong>No Remote Backend:</strong> Inspektr operates without an external API backend or server database.</li>
     </ul>
 
-    <h2>3. Local Device Storage</h2>
+    <h2>3. Local Device Memory & Zero Persistent Storage</h2>
     <p>
-      Inspektr uses the browser's native <code>chrome.storage.local</code> API solely to store user UI preferences (such as enabling/disabling active tool states or popup options). This data:
+      Inspektr does not use persistent local storage APIs (such as <code>chrome.storage</code> or cookies). Active tool states and temporary page inspection data are held strictly in transient session memory within the browser while the inspected tab remains active. This data:
     </p>
     <ul>
       <li>Never leaves your local computer.</li>
-      <li>Is never transmitted across the network.</li>
-      <li>Is automatically cleared when removing the extension or resetting extension data.</li>
+      <li>Is never transmitted across any network.</li>
+      <li>Is completely purged as soon as the tab is closed, reloaded, or the tool is exited.</li>
     </ul>
 
     <h2>4. Manifest V3 Permissions Explained</h2>
@@ -228,12 +228,6 @@
         <td><span class="permission-name">scripting</span></td>
         <td>
           Permits on-demand injection of tool modules (such as the Font Detector or upcoming color/image inspectors) into the active tab upon user request, avoiding permanent background access to all websites.
-        </td>
-      </tr>
-      <tr>
-        <td><span class="permission-name">storage</span></td>
-        <td>
-          Saves user settings and tool states locally on your device via <code>chrome.storage.local</code>.
         </td>
       </tr>
     </table>

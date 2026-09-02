@@ -8,7 +8,7 @@ Chrome / Chromium Extension (Manifest V3) for web developers and designers.
 
 ```
 inspektr/
-├── manifest.json              # MV3 manifest (activeTab, scripting, storage)
+├── manifest.json              # MV3 manifest (activeTab, scripting)
 ├── background/
 │   └── service-worker.js      # Background worker: tab state & script injection
 ├── content/
@@ -53,7 +53,7 @@ inspektr/
 ## 3. Development Guidelines
 
 - **Shadow DOM**: All in-page UI elements MUST live inside a closed Shadow DOM to avoid CSS conflicts with target websites.
-- **Least Privilege**: Only use `activeTab`, `scripting`, and `storage`. Never add broad `<all_urls>` host permissions.
+- **Least Privilege**: Only use `activeTab` and `scripting`. Never add broad `<all_urls>` host permissions or unused permissions.
 - **Pure JavaScript**: No external dependencies or bundlers required.
 - **Icons**: Always use official PNG assets from `assets/icons/` (`icon32.png`, `icon48.png`, etc.).
 - **Build / Packaging**: Run `bash build.sh` to validate `manifest.json` and generate `inspektr-v<version>.zip`.

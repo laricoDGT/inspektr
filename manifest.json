@@ -3,7 +3,7 @@
   "name": "Inspektr",
   "short_name": "Inspektr",
   "description": "Inspect fonts, colors, images and more on any webpage. A developer toolkit for web designers and engineers.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Inspektr",
   "homepage_url": "https://github.com/laricoDGT/inspektr",
 
@@ -32,8 +32,7 @@
 
   "permissions": [
     "activeTab",
-    "scripting",
-    "storage"
+    "scripting"
   ],
 
   "content_security_policy": {
